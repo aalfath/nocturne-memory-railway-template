@@ -22,11 +22,10 @@ ENV PYTHONUNBUFFERED=1 \
     MALLOC_ARENA_MAX=2 \
     SNAPSHOT_DIR=/app/snapshots \
     PORT=8233
-# pg_dump 18 from PGDG (plain HTTP; apt checks the repo signature with the pinned key): upstream runs pg_dump before schema migrations and aborts if the client is older than the server.
-COPY pgdg.asc /usr/share/keyrings/pgdg.asc
-RUN echo "deb [signed-by=/usr/share/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt trixie-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends postgresql-client-18 tini \
+# No pg_dump on purpose: upstream aborts migrations when pg_dump is older than the server, and without
+# pg_dump it falls back to a JSON data export (the dump would sit on the container's ephemeral disk anyway).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tini \
  && rm -r /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=src /src/nocturne/backend/requirements.txt /app/requirements.txt
