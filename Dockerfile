@@ -30,7 +30,8 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=src /src/nocturne/backend/requirements.txt /app/requirements.txt
 COPY railway/constraints.txt /tmp/constraints.txt
-RUN pip install -r /app/requirements.txt -c /tmp/constraints.txt \
+# greenlet: SQLAlchemy 2.1 no longer installs it by default, but upstream's async engine needs it.
+RUN pip install -r /app/requirements.txt greenlet -c /tmp/constraints.txt \
  && rm /tmp/constraints.txt
 COPY --from=src /src/nocturne/backend/ /app/
 COPY --from=ui /ui/dist /frontend/dist
