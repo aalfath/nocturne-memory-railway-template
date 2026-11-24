@@ -7,7 +7,7 @@ FROM python:3.12.16-slim-trixie@sha256:37fc60d303cb9294d3718b5b48998a0210bb1c736
 ARG NOCTURNE_COMMIT
 ARG NOCTURNE_SHA256
 WORKDIR /src
-RUN python -c "import hashlib,sys,tarfile,urllib.request;u='https://github.com/Dataojitori/nocturne_memory/archive/${NOCTURNE_COMMIT}.tar.gz';d=urllib.request.urlopen(u,timeout=120).read();h=hashlib.sha256(d).hexdigest();print('sha256',h);sys.exit(0 if h=='${NOCTURNE_SHA256}' else 'checksum mismatch');open('/tmp/s.tgz','wb').write(d);tarfile.open('/tmp/s.tgz').extractall('/src',filter='data')" \
+RUN python -c "import hashlib,sys,tarfile,urllib.request;u='https://github.com/Dataojitori/nocturne_memory/archive/${NOCTURNE_COMMIT}.tar.gz';d=urllib.request.urlopen(u,timeout=120).read();h=hashlib.sha256(d).hexdigest();print('sha256',h);h=='${NOCTURNE_SHA256}' or sys.exit('checksum mismatch');open('/tmp/s.tgz','wb').write(d);tarfile.open('/tmp/s.tgz').extractall('/src',filter='data')" \
  && mv /src/nocturne_memory-${NOCTURNE_COMMIT} /src/nocturne
 
 FROM node:22.23.5-trixie-slim@sha256:fbd104a10cdcca7ab9fb59c10eaabbadde592dd8b3bd297038236aec621437ea AS ui
